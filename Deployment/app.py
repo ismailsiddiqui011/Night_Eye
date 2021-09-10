@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 import cv2
 from skimage.transform import resize
+from skimage.io import imread
 import re
 import collections
 import warnings
