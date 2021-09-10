@@ -29,25 +29,26 @@ for i, file in enumerate(files):
     model.weights[i] = weights
     model.weights[i].assign(tf.reshape(weights, model.weights[i].numpy().shape))
 
-img_file = st.file_uploader("Upload an image", type = ["png", "jpg", "jpeg"])
+choice = st.selectbox('Choose one of the following', ('URL', 'Upload Image'))
+if choice == 'URL':
+    image_path = st.text_input('Enter image URL...')
+    try:
+      img = imread(image_path)
+      img = resize(img, (256, 256))
+    except:
+      st.markdown('Enter a Valid URL!!!')
 
-def process(image):
-    if image is not None:
-        img = np.array(Image.open(image))
-        img = img/255
-        img = resize(img, (256, 256))
-        return img
+if choice == 'Upload Image':
+    img = st.file_uploader('Upload an Image')
+    if img == None:
+      st.markdown('Upload Image')
     else:
-        st.text('Upload a Image')	
-if img_file is not None:
-    img = process(img_file)
-
-def predict(image):
-    img = np.expand_dims(image, axis = 0)   
-    pred = model.predict(img)[0]
+      img = Image.open(img)
+      img = np.array(img)/255
+      img = resize(img, (256, 256))
+try:
+    pred = model.predict(np.expand_dims(img, 0))[0]
     pred = np.clip(pred, 0, 1)
-    return pred
-
-if img_file is not None:
-    pred = predict(img)
     st.image([img, pred], caption = ['Input', 'Prediction'], width = 256)
+except:
+    pass
